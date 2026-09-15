@@ -231,10 +231,23 @@ WHERE revoked_at IS NULL;
 但此欄位在資料庫設計上刻意允許 NULL（使用者當天可能未填寫此項），而原始型別 `boolean` 僅能表示 true/false，無法表示「未填寫」。
 改用包裝類別 `Boolean` 後才能正確對應資料庫的 nullable 欄位語意。
 
-## 未來規劃
+## 已知限制與後續規劃
 
-- 教練端（training_records / training_exercises）資料表已完成設計並建立於資料庫 schema 中，考量開發時程，
-- 本次繳交版本優先完整實作醫生-病人授權主線；教練端 API 可直接沿用相同的 `data_authorizations` 授權模式擴充，無需更動資料庫結構
-- 快取撤銷聯動：授權撤銷時主動清除相關快取（目前為簡化版本，快取存活期間內即使授權被撤銷仍可能取得快取結果）
+**1. 快取與授權撤銷未聯動**
+醫師查詢醫療紀錄的結果會存入 Redis（key 為 doctorId + patientId）。
+由於 `@Cacheable` 在快取命中時不會執行 Service 方法，授權檢查會被跳過，
+因此在快取存活期間內撤銷授權，該醫師仍可能讀到資料。
+解法為在撤銷授權的方法加上 `@CacheEvict` 主動清除對應 key，
+並搭配 TTL 作為兜底機制。
+
+**2. 教練端 API 尚未實作**
+training_records / training_exercises 資料表已完成設計並建立於 schema，
+考量開發時程，本版優先完整實作醫師-病人授權主線。
+教練端可直接沿用相同的 data_authorizations 授權模式擴充，無需更動資料庫結構。
+
+**3. API 回應層尚未統一使用 DTO**
+部分 Controller 直接回傳 Entity，應改為 Response DTO 以避免暴露內部欄位。
+
+**4. 尚未導入 API 文件（Swagger / OpenAPI）**
 
 
