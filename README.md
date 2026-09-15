@@ -245,9 +245,7 @@ training_records / training_exercises 資料表已完成設計並建立於 schem
 考量開發時程，本版優先完整實作醫師-病人授權主線。
 教練端可直接沿用相同的 data_authorizations 授權模式擴充，無需更動資料庫結構。
 
-**3. API 回應層尚未統一使用 DTO**
-部分 Controller 直接回傳 Entity，應改為 Response DTO 以避免暴露內部欄位。
 
-**4. 尚未導入 API 文件（Swagger / OpenAPI）**
+**3. 尚未導入 API 文件（Swagger / OpenAPI）**
 
 
